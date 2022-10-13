@@ -22,7 +22,7 @@ SET TEXTSIZE 2147483647
 --Modification History: Listing Of All Modifications Since Original Implementation
 -----------------------------------------------------------------------------------------------------------------------------
 
---Description: Fixed Bug Affecting "month_weekdays_remaining" And "quarter_weekdays_remaining" Columns
+--Description: Fixed Bug Affecting "Month_Weekdays_Remaining" And "Quarter_Weekdays_Remaining" Columns
 --Date (MM/DD/YYYY): 07/02/2014
 
 
@@ -44,10 +44,10 @@ SET @Date_End = '20501231'
 --Error Trapping: Check If Permanent Table(s) Already Exist(s) And Drop If Applicable
 -----------------------------------------------------------------------------------------------------------------------------
 
-IF OBJECT_ID(N'dbo.date_calendar', N'U') IS NOT NULL
+IF OBJECT_ID(N'dbo.Date_Calendar', N'U') IS NOT NULL
 BEGIN
 
-  DROP TABLE dbo.date_calendar
+  DROP TABLE dbo.Date_Calendar
 
 END
 
@@ -56,48 +56,48 @@ END
 --Permanent Table: Create Date Xref Table
 -----------------------------------------------------------------------------------------------------------------------------
 
-CREATE TABLE dbo.date_calendar (
-  calendar_date datetime NOT NULL CONSTRAINT PK_date_calendar_calendar_date PRIMARY KEY CLUSTERED,
-  calendar_year smallint NULL,
-  calendar_month tinyint NULL,
-  calendar_day tinyint NULL,
-  calendar_quarter tinyint NULL,
-  first_day_in_week datetime NULL,
-  last_day_in_week datetime NULL,
-  is_week_in_same_month int NULL,
-  first_day_in_month datetime NULL,
-  last_day_in_month datetime NULL,
-  is_last_day_in_month int NULL,
-  first_day_in_quarter datetime NULL,
-  last_day_in_quarter datetime NULL,
-  is_last_day_in_quarter int NULL,
-  day_of_week tinyint NULL,
-  week_of_month tinyint NULL,
-  week_of_quarter tinyint NULL,
-  week_of_year tinyint NULL,
-  days_in_month tinyint NULL,
-  month_days_remaining tinyint NULL,
-  weekdays_in_month tinyint NULL,
-  month_weekdays_remaining tinyint NULL,
-  month_weekdays_completed tinyint NULL,
-  days_in_quarter tinyint NULL,
-  quarter_days_remaining tinyint NULL,
-  quarter_days_completed tinyint NULL,
-  weekdays_in_quarter tinyint NULL,
-  quarter_weekdays_remaining tinyint NULL,
-  quarter_weekdays_completed tinyint NULL,
-  day_of_year smallint NULL,
-  year_days_remaining smallint NULL,
-  is_weekday int NULL,
-  is_leap_year int NULL,
-  day_name varchar(10) NULL,
-  month_day_name_instance tinyint NULL,
-  quarter_day_name_instance tinyint NULL,
-  year_day_name_instance tinyint NULL,
-  month_name varchar(10) NULL,
-  year_week char(6) NULL,
-  year_month char(6) NULL,
-  year_quarter char(6) NULL
+CREATE TABLE dbo.Date_Calendar (
+  Calendar_Date datetime NOT NULL CONSTRAINT PK_Date_Calendar_Calendar_Date PRIMARY KEY CLUSTERED,
+  Calendar_Year smallint NULL,
+  Calendar_Month tinyint NULL,
+  Calendar_Day tinyint NULL,
+  Calendar_Quarter tinyint NULL,
+  First_Day_in_Week datetime NULL,
+  Last_Day_in_Week datetime NULL,
+  Is_Week_in_Same_Month int NULL,
+  First_Day_in_Month datetime NULL,
+  Last_Day_in_Month datetime NULL,
+  Is_Last_Day_in_Month int NULL,
+  First_Day_in_Quarter datetime NULL,
+  Last_Day_in_Quarter datetime NULL,
+  Is_Last_Day_in_Quarter int NULL,
+  Day_of_Week tinyint NULL,
+  Week_of_Month tinyint NULL,
+  Week_of_Quarter tinyint NULL,
+  Week_of_Year tinyint NULL,
+  Days_in_Month tinyint NULL,
+  Month_Days_Remaining tinyint NULL,
+  Weekdays_in_Month tinyint NULL,
+  Month_Weekdays_Remaining tinyint NULL,
+  Month_Weekdays_Completed tinyint NULL,
+  Days_in_Quarter tinyint NULL,
+  Quarter_Days_Remaining tinyint NULL,
+  Quarter_Days_Completed tinyint NULL,
+  Weekdays_in_Quarter tinyint NULL,
+  Quarter_Weekdays_Remaining tinyint NULL,
+  Quarter_Weekdays_Completed tinyint NULL,
+  Day_of_Year smallint NULL,
+  Year_Days_Remaining smallint NULL,
+  Is_Weekday int NULL,
+  Is_Leap_Year int NULL,
+  Day_Name varchar(10) NULL,
+  Month_Day_Name_Instance tinyint NULL,
+  Quarter_Day_Name_Instance tinyint NULL,
+  Year_Day_Name_Instance tinyint NULL,
+  Month_Name varchar(10) NULL,
+  Year_Week char(6) NULL,
+  Year_Month char(6) NULL,
+  Year_Quarter char(6) NULL
 )
 
 
@@ -108,19 +108,19 @@ CREATE TABLE dbo.date_calendar (
 ;
 WITH CTE_Date_Base_Table
 AS (SELECT
-  @Date_Start AS calendar_date
+  @Date_Start AS Calendar_Date
 
 UNION ALL
 
 SELECT
-  DATEADD(DAY, 1, cDBT.calendar_date)
+  DATEADD(DAY, 1, cDBT.Calendar_Date)
 FROM CTE_Date_Base_Table cDBT
-WHERE DATEADD(DAY, 1, cDBT.calendar_date) <= @Date_End)
+WHERE DATEADD(DAY, 1, cDBT.Calendar_Date) <= @Date_End)
 
-INSERT INTO dbo.date_calendar (calendar_date)
+INSERT INTO dbo.Date_Calendar (Calendar_Date)
 
   SELECT
-    cDBT.calendar_date
+    cDBT.Calendar_Date
   FROM CTE_Date_Base_Table cDBT
   OPTION (MAXRECURSION 0)
 
@@ -129,76 +129,76 @@ INSERT INTO dbo.date_calendar (calendar_date)
 --Table Update I: Populate Additional Date Xref Table Fields (Pass I)
 -----------------------------------------------------------------------------------------------------------------------------
 
-UPDATE dbo.date_calendar
-SET calendar_year = DATEPART(YEAR, calendar_date),
-    calendar_month = DATEPART(MONTH, calendar_date),
-    calendar_day = DATEPART(DAY, calendar_date),
-    calendar_quarter = DATEPART(QUARTER, calendar_date),
-    first_day_in_week = DATEADD(DAY, -DATEPART(WEEKDAY, calendar_date) + 1, calendar_date),
-    first_day_in_month = CONVERT(varchar(6), calendar_date, 112) + '01',
-    day_of_week = DATEPART(WEEKDAY, calendar_date),
-    week_of_year = DATEPART(WEEK, calendar_date),
-    day_of_year = DATEPART(DAYOFYEAR, calendar_date),
-    is_weekday = (CASE
-      WHEN ((@@DATEFIRST - 1) + (DATEPART(WEEKDAY, calendar_date) - 1)) % 7 NOT IN (5, 6) THEN 1
+UPDATE dbo.Date_Calendar
+SET Calendar_Year = DATEPART(YEAR, Calendar_Date),
+    Calendar_Month = DATEPART(MONTH, Calendar_Date),
+    Calendar_Day = DATEPART(DAY, Calendar_Date),
+    Calendar_Quarter = DATEPART(QUARTER, Calendar_Date),
+    First_Day_in_Week = DATEADD(DAY, -DATEPART(WEEKDAY, Calendar_Date) + 1, Calendar_Date),
+    First_Day_in_Month = CONVERT(varchar(6), Calendar_Date, 112) + '01',
+    Day_of_Week = DATEPART(WEEKDAY, Calendar_Date),
+    Week_of_Year = DATEPART(WEEK, Calendar_Date),
+    Day_of_Year = DATEPART(DAYOFYEAR, Calendar_Date),
+    Is_Weekday = (CASE
+      WHEN ((@@DATEFIRST - 1) + (DATEPART(WEEKDAY, Calendar_Date) - 1)) % 7 NOT IN (5, 6) THEN 1
       ELSE 0
     END),
-    day_name = DATENAME(WEEKDAY, calendar_date),
-    month_name = DATENAME(MONTH, calendar_date)
+    Day_Name = DATENAME(WEEKDAY, Calendar_Date),
+    Month_Name = DATENAME(MONTH, Calendar_Date)
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN calendar_year int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Calendar_Year int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN calendar_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Calendar_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN calendar_day int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Calendar_Day int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN calendar_quarter int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Calendar_Quarter int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN first_day_in_week datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN First_Day_in_Week datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN first_day_in_month datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN First_Day_in_Month datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN day_of_week int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Day_of_Week int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN week_of_year int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Week_of_Year int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN day_of_year int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Day_of_Year int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN is_weekday int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Is_Weekday int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN day_name varchar(10) NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Day_Name varchar(10) NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN month_name varchar(10) NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Month_Name varchar(10) NOT NULL
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_calendar_year ON dbo.date_calendar (calendar_year)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Calendar_Year ON dbo.Date_Calendar (Calendar_Year)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_calendar_month ON dbo.date_calendar (calendar_month)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Calendar_Month ON dbo.Date_Calendar (Calendar_Month)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_calendar_quarter ON dbo.date_calendar (calendar_quarter)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Calendar_Quarter ON dbo.Date_Calendar (Calendar_Quarter)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_first_day_in_week ON dbo.date_calendar (first_day_in_week)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_First_Day_in_Week ON dbo.Date_Calendar (First_Day_in_Week)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_day_of_week ON dbo.date_calendar (day_of_week)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Day_of_Week ON dbo.Date_Calendar (Day_of_Week)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_is_weekday ON dbo.date_calendar (is_weekday)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Is_Weekday ON dbo.Date_Calendar (Is_Weekday)
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -206,72 +206,72 @@ CREATE NONCLUSTERED INDEX IX_date_calendar_is_weekday ON dbo.date_calendar (is_w
 -----------------------------------------------------------------------------------------------------------------------------
 
 UPDATE DC
-SET DC.last_day_in_week = DC.first_day_in_week + 6,
-    DC.last_day_in_month = DATEADD(MONTH, 1, DC.first_day_in_month) - 1,
-    DC.first_day_in_quarter = sqDC.first_day_in_quarter,
-    DC.last_day_in_quarter = sqDC.last_day_in_quarter,
-    DC.week_of_month = DATEDIFF(WEEK, DC.first_day_in_month, DC.calendar_date) + 1,
-    DC.week_of_quarter = (DC.week_of_year - sqDC.min_week_of_year_in_quarter) + 1,
-    DC.is_leap_year = (CASE
-      WHEN DC.calendar_year % 400 = 0 THEN 1
-      WHEN DC.calendar_year % 100 = 0 THEN 0
-      WHEN DC.calendar_year % 4 = 0 THEN 1
+SET DC.Last_Day_in_Week = DC.First_Day_in_Week + 6,
+    DC.Last_Day_in_Month = DATEADD(MONTH, 1, DC.First_Day_in_Month) - 1,
+    DC.First_Day_in_Quarter = sqDC.First_Day_in_Quarter,
+    DC.Last_Day_in_Quarter = sqDC.Last_Day_in_Quarter,
+    DC.Week_of_Month = DATEDIFF(WEEK, DC.First_Day_in_Month, DC.Calendar_Date) + 1,
+    DC.Week_of_Quarter = (DC.Week_of_Year - sqDC.min_Week_of_Year_in_quarter) + 1,
+    DC.Is_Leap_Year = (CASE
+      WHEN DC.Calendar_Year % 400 = 0 THEN 1
+      WHEN DC.Calendar_Year % 100 = 0 THEN 0
+      WHEN DC.Calendar_Year % 4 = 0 THEN 1
       ELSE 0
     END),
-    DC.year_week = CONVERT(varchar(4), DC.calendar_year) + RIGHT('0' + CONVERT(varchar(2), DC.week_of_year), 2),
-    DC.year_month = CONVERT(varchar(4), DC.calendar_year) + RIGHT('0' + CONVERT(varchar(2), DC.calendar_month), 2),
-    DC.year_quarter = CONVERT(varchar(4), DC.calendar_year) + 'Q' + CONVERT(varchar(1), DC.calendar_quarter)
-FROM dbo.date_calendar DC
+    DC.Year_Week = CONVERT(varchar(4), DC.Calendar_Year) + RIGHT('0' + CONVERT(varchar(2), DC.Week_of_Year), 2),
+    DC.Year_Month = CONVERT(varchar(4), DC.Calendar_Year) + RIGHT('0' + CONVERT(varchar(2), DC.Calendar_Month), 2),
+    DC.Year_Quarter = CONVERT(varchar(4), DC.Calendar_Year) + 'Q' + CONVERT(varchar(1), DC.Calendar_Quarter)
+FROM dbo.Date_Calendar DC
 INNER JOIN (SELECT
-  DC.calendar_year,
-  DC.calendar_quarter,
-  MIN(DC.calendar_date) AS first_day_in_quarter,
-  MAX(DC.calendar_date) AS last_day_in_quarter,
-  MIN(DC.week_of_year) AS min_week_of_year_in_quarter
-FROM dbo.date_calendar DC
-GROUP BY DC.calendar_year,
-         DC.calendar_quarter) sqDC
-  ON sqDC.calendar_year = DC.calendar_year
-  AND sqDC.calendar_quarter = DC.calendar_quarter
+  DC.Calendar_Year,
+  DC.Calendar_Quarter,
+  MIN(DC.Calendar_Date) AS First_Day_in_Quarter,
+  MAX(DC.Calendar_Date) AS Last_Day_in_Quarter,
+  MIN(DC.Week_of_Year) AS min_Week_of_Year_in_quarter
+FROM dbo.Date_Calendar DC
+GROUP BY DC.Calendar_Year,
+         DC.Calendar_Quarter) sqDC
+  ON sqDC.Calendar_Year = DC.Calendar_Year
+  AND sqDC.Calendar_Quarter = DC.Calendar_Quarter
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN last_day_in_week datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Last_Day_in_Week datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN last_day_in_month datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Last_Day_in_Month datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN first_day_in_quarter datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN First_Day_in_Quarter datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN last_day_in_quarter datetime NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Last_Day_in_Quarter datetime NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN week_of_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Week_of_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN week_of_quarter int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Week_of_Quarter int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN is_leap_year int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Is_Leap_Year int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN year_week varchar(6) NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Year_Week varchar(6) NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN year_month varchar(6) NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Year_Month varchar(6) NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN year_quarter varchar(6) NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Year_Quarter varchar(6) NOT NULL
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_last_day_in_week ON dbo.date_calendar (last_day_in_week)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Last_Day_in_Week ON dbo.Date_Calendar (Last_Day_in_Week)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_year_month ON dbo.date_calendar (year_month)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Year_Month ON dbo.Date_Calendar (Year_Month)
 
 
-CREATE NONCLUSTERED INDEX IX_date_calendar_year_quarter ON dbo.date_calendar (year_quarter)
+CREATE NONCLUSTERED INDEX IX_Date_Calendar_Year_Quarter ON dbo.Date_Calendar (Year_Quarter)
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -279,58 +279,58 @@ CREATE NONCLUSTERED INDEX IX_date_calendar_year_quarter ON dbo.date_calendar (ye
 -----------------------------------------------------------------------------------------------------------------------------
 
 UPDATE DC
-SET DC.is_last_day_in_month = (CASE
-      WHEN DC.last_day_in_month = DC.calendar_date THEN 1
+SET DC.Is_Last_Day_in_Month = (CASE
+      WHEN DC.Last_Day_in_Month = DC.Calendar_Date THEN 1
       ELSE 0
     END),
-    DC.is_last_day_in_quarter = (CASE
-      WHEN DC.last_day_in_quarter = DC.calendar_date THEN 1
+    DC.Is_Last_Day_in_Quarter = (CASE
+      WHEN DC.Last_Day_in_Quarter = DC.Calendar_Date THEN 1
       ELSE 0
     END),
-    DC.days_in_month = DATEPART(DAY, DC.last_day_in_month),
-    DC.weekdays_in_month = sqDC1.weekdays_in_month,
-    DC.days_in_quarter = DATEDIFF(DAY, DC.first_day_in_quarter, DC.last_day_in_quarter) + 1,
-    DC.quarter_days_remaining = DATEDIFF(DAY, DC.calendar_date, DC.last_day_in_quarter),
-    DC.weekdays_in_quarter = sqDC2.weekdays_in_quarter,
-    DC.year_days_remaining = (365 + DC.is_leap_year) - DC.day_of_year
-FROM dbo.date_calendar DC
+    DC.Days_in_Month = DATEPART(DAY, DC.Last_Day_in_Month),
+    DC.Weekdays_in_Month = sqDC1.Weekdays_in_Month,
+    DC.Days_in_Quarter = DATEDIFF(DAY, DC.First_Day_in_Quarter, DC.Last_Day_in_Quarter) + 1,
+    DC.Quarter_Days_Remaining = DATEDIFF(DAY, DC.Calendar_Date, DC.Last_Day_in_Quarter),
+    DC.Weekdays_in_Quarter = sqDC2.Weekdays_in_Quarter,
+    DC.Year_Days_Remaining = (365 + DC.Is_Leap_Year) - DC.Day_of_Year
+FROM dbo.Date_Calendar DC
 INNER JOIN (SELECT
-  DC.year_month,
-  SUM(DC.is_weekday) AS weekdays_in_month
-FROM dbo.date_calendar DC
-GROUP BY DC.year_month) sqDC1
-  ON sqDC1.year_month = DC.year_month
+  DC.Year_Month,
+  SUM(DC.Is_Weekday) AS Weekdays_in_Month
+FROM dbo.Date_Calendar DC
+GROUP BY DC.Year_Month) sqDC1
+  ON sqDC1.Year_Month = DC.Year_Month
 
 INNER JOIN (SELECT
-  DC.year_quarter,
-  SUM(DC.is_weekday) AS weekdays_in_quarter
-FROM dbo.date_calendar DC
-GROUP BY DC.year_quarter) sqDC2
-  ON sqDC2.year_quarter = DC.year_quarter
+  DC.Year_Quarter,
+  SUM(DC.Is_Weekday) AS Weekdays_in_Quarter
+FROM dbo.Date_Calendar DC
+GROUP BY DC.Year_Quarter) sqDC2
+  ON sqDC2.Year_Quarter = DC.Year_Quarter
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN is_last_day_in_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Is_Last_Day_in_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN is_last_day_in_quarter int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Is_Last_Day_in_Quarter int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN days_in_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Days_in_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN weekdays_in_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Weekdays_in_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN days_in_quarter int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Days_in_Quarter int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_days_remaining int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Quarter_Days_Remaining int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN weekdays_in_quarter int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Weekdays_in_Quarter int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN year_days_remaining int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Year_Days_Remaining int NOT NULL
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -338,28 +338,28 @@ ALTER TABLE dbo.date_calendar ALTER COLUMN year_days_remaining int NOT NULL
 -----------------------------------------------------------------------------------------------------------------------------
 
 UPDATE DC
-SET DC.month_weekdays_remaining = DC.weekdays_in_month - sqDC.month_weekdays_remaining_subtraction,
-    DC.quarter_weekdays_remaining = DC.weekdays_in_quarter - sqDC.quarter_weekdays_remaining_subtraction
-FROM dbo.date_calendar DC
+SET DC.Month_Weekdays_Remaining = DC.Weekdays_in_Month - sqDC.Month_Weekdays_Remaining_subtraction,
+    DC.Quarter_Weekdays_Remaining = DC.Weekdays_in_Quarter - sqDC.Quarter_Weekdays_Remaining_subtraction
+FROM dbo.Date_Calendar DC
 INNER JOIN (SELECT
-  DC.calendar_date,
+  DC.Calendar_Date,
   ROW_NUMBER() OVER
   (
   PARTITION BY
-  DC.year_month
+  DC.Year_Month
   ORDER BY
-  DC.calendar_date
-  ) AS month_weekdays_remaining_subtraction,
+  DC.Calendar_Date
+  ) AS Month_Weekdays_Remaining_subtraction,
   ROW_NUMBER() OVER
   (
   PARTITION BY
-  DC.year_quarter
+  DC.Year_Quarter
   ORDER BY
-  DC.calendar_date
-  ) AS quarter_weekdays_remaining_subtraction
-FROM dbo.date_calendar DC
-WHERE DC.is_weekday = 1) sqDC
-  ON sqDC.calendar_date = DC.calendar_date
+  DC.Calendar_Date
+  ) AS Quarter_Weekdays_Remaining_subtraction
+FROM dbo.Date_Calendar DC
+WHERE DC.Is_Weekday = 1) sqDC
+  ON sqDC.Calendar_Date = DC.Calendar_Date
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -367,32 +367,32 @@ WHERE DC.is_weekday = 1) sqDC
 -----------------------------------------------------------------------------------------------------------------------------
 
 UPDATE DC
-SET DC.month_weekdays_remaining = (CASE
-      WHEN DC1.calendar_month = DC.calendar_month AND
-        DC1.month_weekdays_remaining IS NOT NULL THEN DC1.month_weekdays_remaining
-      WHEN DC2.calendar_month = DC.calendar_month AND
-        DC2.month_weekdays_remaining IS NOT NULL THEN DC2.month_weekdays_remaining
-      ELSE DC.weekdays_in_month
+SET DC.Month_Weekdays_Remaining = (CASE
+      WHEN DC1.Calendar_Month = DC.Calendar_Month AND
+        DC1.Month_Weekdays_Remaining IS NOT NULL THEN DC1.Month_Weekdays_Remaining
+      WHEN DC2.Calendar_Month = DC.Calendar_Month AND
+        DC2.Month_Weekdays_Remaining IS NOT NULL THEN DC2.Month_Weekdays_Remaining
+      ELSE DC.Weekdays_in_Month
     END),
-    DC.quarter_weekdays_remaining = (CASE
-      WHEN DC1.calendar_quarter = DC.calendar_quarter AND
-        DC1.quarter_weekdays_remaining IS NOT NULL THEN DC1.quarter_weekdays_remaining
-      WHEN DC2.calendar_quarter = DC.calendar_quarter AND
-        DC2.quarter_weekdays_remaining IS NOT NULL THEN DC2.quarter_weekdays_remaining
-      ELSE DC.weekdays_in_quarter
+    DC.Quarter_Weekdays_Remaining = (CASE
+      WHEN DC1.Calendar_Quarter = DC.Calendar_Quarter AND
+        DC1.Quarter_Weekdays_Remaining IS NOT NULL THEN DC1.Quarter_Weekdays_Remaining
+      WHEN DC2.Calendar_Quarter = DC.Calendar_Quarter AND
+        DC2.Quarter_Weekdays_Remaining IS NOT NULL THEN DC2.Quarter_Weekdays_Remaining
+      ELSE DC.Weekdays_in_Quarter
     END)
-FROM dbo.date_calendar DC
-LEFT JOIN dbo.date_calendar DC1
-  ON DATEADD(DAY, 1, DC1.calendar_date) = DC.calendar_date
-LEFT JOIN dbo.date_calendar DC2
-  ON DATEADD(DAY, 2, DC2.calendar_date) = DC.calendar_date
-WHERE DC.month_weekdays_remaining IS NULL
+FROM dbo.Date_Calendar DC
+LEFT JOIN dbo.Date_Calendar DC1
+  ON DATEADD(DAY, 1, DC1.Calendar_Date) = DC.Calendar_Date
+LEFT JOIN dbo.Date_Calendar DC2
+  ON DATEADD(DAY, 2, DC2.Calendar_Date) = DC.Calendar_Date
+WHERE DC.Month_Weekdays_Remaining IS NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN month_weekdays_remaining int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Month_Weekdays_Remaining int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_weekdays_remaining int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Quarter_Weekdays_Remaining int NOT NULL
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -400,68 +400,68 @@ ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_weekdays_remaining int NOT NU
 -----------------------------------------------------------------------------------------------------------------------------
 
 UPDATE DC
-SET DC.is_week_in_same_month = sqDC.is_week_in_same_month,
-    DC.month_days_remaining = DC.days_in_month - DC.calendar_day,
-    DC.month_weekdays_completed = DC.weekdays_in_month - DC.month_weekdays_remaining,
-    DC.quarter_days_completed = DC.days_in_quarter - DC.quarter_days_remaining,
-    DC.quarter_weekdays_completed = DC.weekdays_in_quarter - DC.quarter_weekdays_remaining,
-    DC.month_day_name_instance = sqDC.month_day_name_instance,
-    DC.quarter_day_name_instance = sqDC.quarter_day_name_instance,
-    DC.year_day_name_instance = sqDC.year_day_name_instance
-FROM dbo.date_calendar DC
+SET DC.Is_Week_in_Same_Month = sqDC.Is_Week_in_Same_Month,
+    DC.Month_Days_Remaining = DC.Days_in_Month - DC.Calendar_Day,
+    DC.Month_Weekdays_Completed = DC.Weekdays_in_Month - DC.Month_Weekdays_Remaining,
+    DC.Quarter_Days_Completed = DC.Days_in_Quarter - DC.Quarter_Days_Remaining,
+    DC.Quarter_Weekdays_Completed = DC.Weekdays_in_Quarter - DC.Quarter_Weekdays_Remaining,
+    DC.Month_Day_Name_Instance = sqDC.Month_Day_Name_Instance,
+    DC.Quarter_Day_Name_Instance = sqDC.Quarter_Day_Name_Instance,
+    DC.Year_Day_Name_Instance = sqDC.Year_Day_Name_Instance
+FROM dbo.Date_Calendar DC
 INNER JOIN (SELECT
-  DC.calendar_date,
+  DC.Calendar_Date,
   (CASE
-    WHEN DATEDIFF(MONTH, DC.first_day_in_week, DC.last_day_in_week) = 0 THEN 1
+    WHEN DATEDIFF(MONTH, DC.First_Day_in_Week, DC.Last_Day_in_Week) = 0 THEN 1
     ELSE 0
-  END) AS is_week_in_same_month,
+  END) AS Is_Week_in_Same_Month,
   ROW_NUMBER() OVER
   (
   PARTITION BY
-  DC.year_month, DC.day_name
+  DC.Year_Month, DC.Day_Name
   ORDER BY
-  DC.calendar_date
-  ) AS month_day_name_instance,
+  DC.Calendar_Date
+  ) AS Month_Day_Name_Instance,
   ROW_NUMBER() OVER
   (
   PARTITION BY
-  DC.year_quarter, DC.day_name
+  DC.Year_Quarter, DC.Day_Name
   ORDER BY
-  DC.calendar_date
-  ) AS quarter_day_name_instance,
+  DC.Calendar_Date
+  ) AS Quarter_Day_Name_Instance,
   ROW_NUMBER() OVER
   (
   PARTITION BY
-  DC.calendar_year, DC.day_name
+  DC.Calendar_Year, DC.Day_Name
   ORDER BY
-  DC.calendar_date
-  ) AS year_day_name_instance
-FROM dbo.date_calendar DC) sqDC
-  ON sqDC.calendar_date = DC.calendar_date
+  DC.Calendar_Date
+  ) AS Year_Day_Name_Instance
+FROM dbo.Date_Calendar DC) sqDC
+  ON sqDC.Calendar_Date = DC.Calendar_Date
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN is_week_in_same_month int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Is_Week_in_Same_Month int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN month_days_remaining int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Month_Days_Remaining int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN month_weekdays_completed int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Month_Weekdays_Completed int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_days_completed int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Quarter_Days_Completed int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_weekdays_completed int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Quarter_Weekdays_Completed int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN month_day_name_instance int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Month_Day_Name_Instance int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN quarter_day_name_instance int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Quarter_Day_Name_Instance int NOT NULL
 
 
-ALTER TABLE dbo.date_calendar ALTER COLUMN year_day_name_instance int NOT NULL
+ALTER TABLE dbo.Date_Calendar ALTER COLUMN Year_Day_Name_Instance int NOT NULL
 
 
 -----------------------------------------------------------------------------------------------------------------------------
@@ -470,5 +470,5 @@ ALTER TABLE dbo.date_calendar ALTER COLUMN year_day_name_instance int NOT NULL
 
 SELECT
   DC.*
-FROM dbo.date_calendar DC
-ORDER BY DC.calendar_date
+FROM dbo.Date_Calendar DC
+ORDER BY DC.Calendar_Date
